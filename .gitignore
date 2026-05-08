@@ -1,0 +1,40 @@
+# ── Secrets and environment ────────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+
+# ── Runtime data (SQLite DB + logs) ────────────────────────────────────────────
+# These are operational artifacts, never source-controlled.
+# Restore from backup; logs rotate locally.
+data/
+*.db
+*.db-shm
+*.db-wal
+logs/
+*.log
+
+# ── Node.js ───────────────────────────────────────────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm
+.yarn-integrity
+package-lock.json
+
+# ── Build artifacts ───────────────────────────────────────────────────────────
+*.tar.gz
+
+# ── OS artifacts ──────────────────────────────────────────────────────────────
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+
+# ── Editor artifacts ──────────────────────────────────────────────────────────
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+*.code-workspace

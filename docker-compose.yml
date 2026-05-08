@@ -1,0 +1,31 @@
+services:
+  drep:
+    build: .
+    container_name: drep
+    ports:
+      - "3100:3000"
+    volumes:
+      - drep-data:/app/data
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - NODE_ENV=production
+    security_opt:
+      - no-new-privileges:true
+    read_only: false        # app writes to /app/data — must stay false
+    tmpfs:
+      - /tmp
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "0.5"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  drep-data:

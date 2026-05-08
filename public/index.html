@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>DREP — Dietary Registry for Event Planning</title>
+  <meta name="description" content="Family dietary needs registry for event planning across generations."/>
+  <link rel="stylesheet" href="/style.css"/>
+</head>
+<body>
+
+<!-- ── VIEW: Login ─────────────────────────────────────────────────────────── -->
+<div id="view-login" class="view">
+  <div class="login-wrap">
+    <div class="login-brand">
+      <div class="brand-icon">🍜</div>
+      <h1>DREP</h1>
+      <p class="brand-sub">Keeping every gathering safe and delicious</p>
+    </div>
+
+    <!-- Section A: Guest -->
+    <div class="login-card">
+      <div class="section-label">Family guest access</div>
+      <div class="form-group">
+        <label for="guest-pin">Family password</label>
+        <div class="input-wrap">
+          <input id="guest-pin" type="password" placeholder="Enter family password" autocomplete="off"/>
+          <button class="eye-btn" data-target="guest-pin" title="Show/hide">👁</button>
+        </div>
+      </div>
+      <button id="btn-guest" class="btn btn-outline w-full">Enter as guest</button>
+      <p id="guest-error" class="form-error hidden"></p>
+    </div>
+
+    <!-- Section B: Sign in -->
+    <div class="login-card">
+      <div class="section-label">Sign in</div>
+      <div class="form-group">
+        <label for="login-email">Email</label>
+        <input id="login-email" type="email" placeholder="your@email.com"/>
+      </div>
+      <div class="form-group">
+        <label for="login-password">Password</label>
+        <div class="input-wrap">
+          <input id="login-password" type="password" placeholder="Password"/>
+          <button class="eye-btn" data-target="login-password" title="Show/hide">👁</button>
+        </div>
+      </div>
+      <button id="btn-login" class="btn btn-primary w-full">Sign in</button>
+      <p id="login-error" class="form-error hidden"></p>
+    </div>
+
+    <!-- Section C: Register (collapsible) -->
+    <div class="login-card">
+      <button class="section-toggle" id="toggle-register">
+        <span>New here? Request access</span>
+        <span class="toggle-arrow">▼</span>
+      </button>
+      <div id="register-panel" class="collapsible hidden">
+        <div class="form-group">
+          <label for="reg-name">Display name</label>
+          <input id="reg-name" type="text" placeholder="Your name"/>
+        </div>
+        <div class="form-group">
+          <label for="reg-email">Email</label>
+          <input id="reg-email" type="email" placeholder="your@email.com"/>
+        </div>
+        <div class="form-group">
+          <label for="reg-password">Password</label>
+          <input id="reg-password" type="password" placeholder="At least 8 characters"/>
+        </div>
+        <div class="form-group">
+          <label for="reg-confirm">Confirm password</label>
+          <input id="reg-confirm" type="password" placeholder="Confirm password"/>
+        </div>
+        <button id="btn-register" class="btn btn-outline w-full">Request access</button>
+        <p id="register-msg" class="form-success hidden"></p>
+        <p id="register-error" class="form-error hidden"></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── VIEW: Pending approval ──────────────────────────────────────────────── -->
+<div id="view-pending" class="view hidden">
+  <div class="pending-wrap">
+    <div class="pending-icon">⏳</div>
+    <h2>Account pending approval</h2>
+    <p>We'll activate your access soon. If you need to view profiles urgently, ask a family member for the guest password.</p>
+    <button id="btn-pending-signout" class="btn btn-outline">Sign out</button>
+  </div>
+</div>
+
+<!-- ── VIEW: Main app ──────────────────────────────────────────────────────── -->
+<div id="view-app" class="view hidden">
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="header-brand">
+        <span class="header-icon">🍜</span>
+        <div>
+          <div class="header-title">DREP</div>
+          <div class="header-sub">Plan every gathering with care</div>
+        </div>
+      </div>
+      <div class="header-right">
+        <div id="user-badge" class="user-badge" style="cursor:pointer" id="btn-profile" title="Edit profile"></div>
+        <a id="guest-signin-link" href="#" class="guest-link hidden">Sign in for full access</a>
+        <button id="btn-open-profile" class="btn btn-sm btn-outline" title="Profile settings">⚙️</button>
+        <button id="btn-signout" class="btn btn-sm btn-outline">Sign out</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Tabs -->
+  <div class="tabs-bar">
+    <div class="tabs-inner">
+      <button class="tab-btn active" data-tab="profiles">🥗 Dietary Profiles</button>
+      <button class="tab-btn" data-tab="events">📅 Upcoming Events</button>
+      <button class="tab-btn tab-admin hidden" data-tab="admin">⚙️ Admin Panel</button>
+    </div>
+  </div>
+
+  <!-- Tab: Dietary Profiles -->
+  <div id="tab-profiles" class="tab-content active">
+    <div class="content-inner">
+      <div class="tab-toolbar">
+        <div class="gen-filter">
+          <button class="filter-btn active" data-gen="all">All</button>
+          <button class="filter-btn" data-gen="1">1st Generation</button>
+          <button class="filter-btn" data-gen="2">2nd Generation</button>
+          <button class="filter-btn" data-gen="3">3rd Generation</button>
+          <span class="filter-divider"></span>
+          <button class="tag-filter-btn" data-tag="allergy">⚠️ Allergies</button>
+          <button class="tag-filter-btn" data-tag="restriction">🚫 Restrictions</button>
+        </div>
+        <button id="btn-add-tag" class="btn btn-primary hidden">+ Add dietary update</button>
+      </div>
+      <div id="members-grid" class="members-grid"></div>
+    </div>
+  </div>
+
+  <!-- Tab: Events -->
+  <div id="tab-events" class="tab-content">
+    <div class="content-inner">
+      <div class="tab-toolbar">
+        <div></div>
+        <button id="btn-add-event" class="btn btn-primary hidden">+ Add a family event</button>
+      </div>
+      <div id="events-list" class="events-list"></div>
+    </div>
+  </div>
+
+  <!-- Tab: Admin -->
+  <div id="tab-admin" class="tab-content">
+    <div class="content-inner">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+        <h2 class="section-title" style="margin:0">Pending Approvals</h2>
+        <button id="btn-backup" class="btn btn-sm btn-outline" title="Download database backup">📥 Backup DB</button>
+      </div>
+      <div id="admin-pending" class="admin-pending"></div>
+      <h2 class="section-title" style="margin-top:2rem">User Management</h2>
+      <div id="admin-users" class="admin-users"></div>
+      <h2 class="section-title" style="margin-top:2rem">
+        Member Management
+        <button id="btn-add-member" class="btn btn-sm btn-primary" style="margin-left:1rem">+ Add member</button>
+      </h2>
+      <div id="admin-members" class="admin-members"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Modal: Add dietary tag ──────────────────────────────────────────────── -->
+<div id="modal-tag" class="modal-backdrop hidden">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Add dietary update</h3>
+      <button class="modal-close" data-modal="modal-tag">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label for="tag-member">Family member</label>
+        <select id="tag-member"></select>
+      </div>
+      <div class="form-group">
+        <label for="tag-type">Tag type</label>
+        <select id="tag-type">
+          <option value="restriction">Restriction</option>
+          <option value="allergy">Allergy</option>
+          <option value="preference">Preference</option>
+          <option value="clinical">Clinical</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="tag-value">Value</label>
+        <input id="tag-value" type="text" placeholder="e.g. No shellfish"/>
+      </div>
+      <div class="form-group">
+        <label for="tag-notes">Context notes (optional)</label>
+        <input id="tag-notes" type="text" placeholder="Additional context"/>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline modal-close" data-modal="modal-tag">Cancel</button>
+      <button id="btn-submit-tag" class="btn btn-primary">Submit update</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Modal: Add event ────────────────────────────────────────────────────── -->
+<div id="modal-event" class="modal-backdrop hidden">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Add a family event</h3>
+      <button class="modal-close" data-modal="modal-event">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label for="ev-type">Event type</label>
+        <input id="ev-type" type="text" placeholder="e.g. Birthday celebration"/>
+      </div>
+      <div class="form-group">
+        <label for="ev-date">Date</label>
+        <input id="ev-date" type="date"/>
+      </div>
+      <div class="form-group">
+        <label for="ev-time">Time</label>
+        <input id="ev-time" type="time"/>
+      </div>
+      <div class="form-group">
+        <label for="ev-location">Location</label>
+        <input id="ev-location" type="text" placeholder="Venue or address"/>
+      </div>
+      <div class="form-group">
+        <label for="ev-details">Details (optional)</label>
+        <textarea id="ev-details" rows="2" placeholder="Event details"></textarea>
+      </div>
+      <div class="form-group">
+        <label for="ev-diet">Dietary notes (optional)</label>
+        <textarea id="ev-diet" rows="2" placeholder="Special dietary arrangements"></textarea>
+      </div>
+      <div class="form-group">
+        <label for="ev-hero">Hero image URL (optional)</label>
+        <input id="ev-hero" type="url" placeholder="https://drive.google.com/uc?export=view&id=..."/>
+        <p class="form-hint">Google Drive: Share file → copy URL → convert to <code>drive.google.com/uc?export=view&id=FILE_ID</code><br>Imgur: Upload photo → right-click image → Copy image address</p>
+        <div id="ev-hero-preview" class="hero-preview hidden"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline modal-close" data-modal="modal-event">Cancel</button>
+      <button id="btn-submit-event" class="btn btn-primary">Submit event</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Modal: Profile settings ──────────────────────────────────────────────── -->
+<div id="modal-profile" class="modal-backdrop hidden">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Profile settings</h3>
+      <button class="modal-close" data-modal="modal-profile">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label for="profile-name">Display name</label>
+        <input id="profile-name" type="text" placeholder="Your name"/>
+      </div>
+      <div class="form-group">
+        <label for="profile-email">Email</label>
+        <input id="profile-email" type="email" placeholder="your@email.com"/>
+      </div>
+      <p id="profile-msg" class="form-success hidden"></p>
+      <p id="profile-error" class="form-error hidden"></p>
+      <hr style="border:none;border-top:1px solid var(--border);margin:1rem 0"/>
+      <p style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);margin-bottom:.75rem">Change password</p>
+      <div class="form-group">
+        <label for="profile-cur-pw">Current password</label>
+        <input id="profile-cur-pw" type="password" placeholder="Current password"/>
+      </div>
+      <div class="form-group">
+        <label for="profile-new-pw">New password</label>
+        <input id="profile-new-pw" type="password" placeholder="New password (8+ chars)"/>
+      </div>
+      <p id="pw-msg" class="form-success hidden"></p>
+      <p id="pw-error" class="form-error hidden"></p>
+    </div>
+    <div class="modal-footer" style="justify-content:space-between;flex-wrap:wrap;gap:.5rem">
+      <button id="btn-change-pw" class="btn btn-outline">Change password</button>
+      <div style="display:flex;gap:.5rem">
+        <button class="btn btn-outline modal-close" data-modal="modal-profile">Cancel</button>
+        <button id="btn-save-profile" class="btn btn-primary">Save profile</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Modal: Add / Edit member ─────────────────────────────────────────────── -->
+<div id="modal-member" class="modal-backdrop hidden">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modal-member-title">Add family member</h3>
+      <button class="modal-close" data-modal="modal-member">✕</button>
+    </div>
+    <div class="modal-body">
+      <input id="member-id" type="hidden"/>
+      <div class="form-row">
+        <div class="form-group" style="flex:2">
+          <label for="member-name">Full name</label>
+          <input id="member-name" type="text" placeholder="e.g. Grandma Yeo"/>
+        </div>
+        <div class="form-group" style="flex:1">
+          <label for="member-initials">Initials</label>
+          <input id="member-initials" type="text" placeholder="GY" maxlength="3"/>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group" style="flex:1">
+          <label for="member-generation">Generation</label>
+          <select id="member-generation">
+            <option value="1">1st Generation</option>
+            <option value="2">2nd Generation</option>
+            <option value="3">3rd Generation</option>
+          </select>
+        </div>
+        <div class="form-group" style="flex:2">
+          <label for="member-relation">Relation / Role</label>
+          <input id="member-relation" type="text" placeholder="e.g. Paternal grandmother"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="member-notes">Notes (optional)</label>
+        <textarea id="member-notes" rows="2" placeholder="Any important context about this person's needs"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Avatar colour</label>
+        <div class="color-picker" id="member-color-picker">
+          <button class="color-swatch active" data-color="blue" style="background:#2563eb" title="Blue"></button>
+          <button class="color-swatch" data-color="purple" style="background:#7c3aed" title="Purple"></button>
+          <button class="color-swatch" data-color="teal" style="background:#0d9488" title="Teal"></button>
+          <button class="color-swatch" data-color="pink" style="background:#db2777" title="Pink"></button>
+          <button class="color-swatch" data-color="coral" style="background:#ea580c" title="Coral"></button>
+          <button class="color-swatch" data-color="green" style="background:#16a34a" title="Green"></button>
+          <button class="color-swatch" data-color="amber" style="background:#d97706" title="Amber"></button>
+        </div>
+        <input id="member-color" type="hidden" value="blue"/>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline modal-close" data-modal="modal-member">Cancel</button>
+      <button id="btn-save-member" class="btn btn-primary">Save member</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Modal: Edit event ──────────────────────────────────────────────────── -->
+<div id="modal-edit-event" class="modal-backdrop hidden">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Edit event</h3>
+      <button class="modal-close" data-modal="modal-edit-event">✕</button>
+    </div>
+    <div class="modal-body">
+      <input id="edit-ev-id" type="hidden"/>
+      <div class="form-group">
+        <label for="edit-ev-type">Event type</label>
+        <input id="edit-ev-type" type="text"/>
+      </div>
+      <div class="form-group">
+        <label for="edit-ev-date">Date</label>
+        <input id="edit-ev-date" type="date"/>
+      </div>
+      <div class="form-group">
+        <label for="edit-ev-time">Time</label>
+        <input id="edit-ev-time" type="time"/>
+      </div>
+      <div class="form-group">
+        <label for="edit-ev-location">Location</label>
+        <input id="edit-ev-location" type="text"/>
+      </div>
+      <div class="form-group">
+        <label for="edit-ev-details">Details</label>
+        <textarea id="edit-ev-details" rows="2"></textarea>
+      </div>
+      <div class="form-group">
+        <label for="edit-ev-diet">Dietary notes</label>
+        <textarea id="edit-ev-diet" rows="2"></textarea>
+      </div>
+      <div class="form-group">
+        <label for="edit-ev-hero">Hero image URL (optional)</label>
+        <input id="edit-ev-hero" type="url" placeholder="https://"/>
+        <p class="form-hint">Google Drive or Imgur direct image URL</p>
+        <div id="edit-ev-hero-preview" class="hero-preview hidden"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline modal-close" data-modal="modal-edit-event">Cancel</button>
+      <button id="btn-save-event" class="btn btn-primary">Save changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Modal: Share event ──────────────────────────────────────────────────── -->
+<div id="modal-share" class="modal-backdrop hidden">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Share event</h3>
+      <button class="modal-close" data-modal="modal-share">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:var(--text-muted);margin-bottom:1rem">Anyone with this link can view the event — no login required.</p>
+      <div class="share-link-row">
+        <input id="share-link-input" type="text" readonly placeholder="Generating link..."/>
+        <button id="btn-copy-share" class="btn btn-sm btn-outline">Copy</button>
+      </div>
+      <label class="share-toggle-row" style="margin-top:1rem">
+        <input id="share-diet-toggle" type="checkbox"/>
+        <span>Include dietary summary</span>
+      </label>
+      <p class="form-hint" style="margin-top:.35rem">Shows aggregate dietary needs (no member names). Off by default.</p>
+    </div>
+    <div class="modal-footer" style="justify-content:space-between">
+      <button id="btn-revoke-share" class="btn btn-sm btn-danger">Revoke link</button>
+      <button class="btn btn-outline modal-close" data-modal="modal-share">Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Modal: Edit tag ────────────────────────────────────────────────────── -->
+<div id="modal-edit-tag" class="modal-backdrop hidden">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Edit dietary tag</h3>
+      <button class="modal-close" data-modal="modal-edit-tag">✕</button>
+    </div>
+    <div class="modal-body">
+      <input id="edit-tag-id" type="hidden"/>
+      <div class="form-group">
+        <label for="edit-tag-type">Tag type</label>
+        <select id="edit-tag-type">
+          <option value="restriction">Restriction</option>
+          <option value="allergy">Allergy</option>
+          <option value="preference">Preference</option>
+          <option value="clinical">Clinical</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="edit-tag-value">Value</label>
+        <input id="edit-tag-value" type="text" placeholder="e.g. No shellfish"/>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline modal-close" data-modal="modal-edit-tag">Cancel</button>
+      <button id="btn-save-tag" class="btn btn-primary">Save changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Toast container ─────────────────────────────────────────────────────── -->
+<div id="toast-container" class="toast-container"></div>
+
+<script src="/app.js"></script>
+</body>
+</html>

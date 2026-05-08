@@ -1,0 +1,16 @@
+node_modules
+.env
+.env.*
+!.env.example
+data/
+logs/
+*.db
+*.db-shm
+*.db-wal
+*.log
+.git
+.gitignore
+README.md
+Makefile
+.DS_Store
+*.tar.gz
