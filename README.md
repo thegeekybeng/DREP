@@ -8,8 +8,6 @@
 
 A secure, self-hosted family health registry for multi-generational event planning. Deployed on a home-lab NAS, served via Cloudflare Tunnel, and actively used by an extended family across three generations.
 
-**Live:** `https://your-domain.example.com` *(self-hosted — deploy your own instance)*
-
 ---
 
 ## The Problem
